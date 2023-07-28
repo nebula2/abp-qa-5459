@@ -12,6 +12,8 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Qa5459.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Qa5459.EntityFrameworkCore;
 
@@ -41,6 +43,10 @@ public class Qa5459EntityFrameworkCoreModule : AbpModule
                 /* Remove "includeAllEntities: true" to create
                  * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
+
+            options.Entity<ParentEntity>(opt => opt.DefaultWithDetailsFunc = q =>
+                    q.Include(m => m.Children)
+                );
         });
 
         Configure<AbpDbContextOptions>(options =>
