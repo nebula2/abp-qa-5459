@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Qa5459.Entities;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -24,6 +26,9 @@ public class Qa5459DbContext :
     ITenantManagementDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
+
+    public DbSet<ParentEntity> Parents { get; set; }
+    public DbSet<ChildEntity> Children { get; set; }
 
     #region Entities from the modules
 
@@ -82,5 +87,22 @@ public class Qa5459DbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+        builder.Entity<ParentEntity>(b =>
+        {
+            b.ToTable(Qa5459Consts.DbTablePrefix + "ParentEntities", Qa5459Consts.DbSchema);
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<ChildEntity>(b =>
+        {
+            b.ToTable(Qa5459Consts.DbTablePrefix + "ChildEntities", Qa5459Consts.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasOne<ParentEntity>()
+                .WithMany(x => x.Children)
+                .HasForeignKey(x => x.ParentEntityId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

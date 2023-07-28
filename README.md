@@ -1,0 +1,1 @@
+`abp new Qa5459 -t app -u blazor-server -d ef`
